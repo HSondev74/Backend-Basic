@@ -12,6 +12,7 @@ const authRouter = require("./routes/auth");
 const genreRouter = require("./routes/genre");
 const workRouter = require("./routes/work");
 const { MongoClient } = require("mongodb");
+const { Work } = require("./models/model");
 
 dotenv.config();
 
@@ -41,8 +42,21 @@ connectToMongoDB();
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 app.use(morgan("common"));
-app.get("/", (request, response) => {
-     response.send("Hello");
+app.get("/", async (req, res) => {
+     if (!req.body.name) {
+          return res.status(400).json({ message: "Missing required fields" });
+     }
+     try {
+          const newWork = new Work(req.body);
+          const savedWork = await newWork.save();
+          res.status(201).json(savedWork);
+     } catch (error) {
+          console.error("Failed to add work:", error);
+          res.status(500).json({
+               message: "Error adding work",
+               details: error.message,
+          });
+     }
 });
 app.use("/v1/author", authorRouter);
 app.use("/v1/book", bookRouter);
