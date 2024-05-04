@@ -11,16 +11,36 @@ const bookRouter = require("./routes/book");
 const authRouter = require("./routes/auth");
 const genreRouter = require("./routes/genre");
 const workRouter = require("./routes/work");
+const { MongoClient } = require("mongodb");
 
 dotenv.config();
 
 //CONNECT DATABASE
 
-mongoose.connect(process.env.MONGODB_URL).then(() => console.log("Connected!"));
+// Connection URI
+const uri = process.env.MONGODB_URL;
+
+// Create a new MongoClient
+const client = new MongoClient(uri, {
+     useNewUrlParser: true,
+     useUnifiedTopology: true,
+});
+
+// Connect to the MongoDB server
+async function connectToMongoDB() {
+     try {
+          await client.connect();
+          console.log("Connected to MongoDB");
+     } catch (err) {
+          console.error("Error connecting to MongoDB:", err);
+     }
+}
+
+connectToMongoDB();
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
-// app.use(morgan("common"));
+app.use(morgan("common"));
 app.get("/", (request, response) => {
      response.send("Hello");
 });
