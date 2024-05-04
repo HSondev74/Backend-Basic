@@ -20,8 +20,10 @@ mongoose.connect(process.env.MONGODB_URL).then(() => console.log("Connected!"));
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
-app.use(morgan("common"));
-
+// app.use(morgan("common"));
+app.get("/", (request, response) => {
+     response.send("Hello");
+});
 app.use("/v1/author", authorRouter);
 app.use("/v1/book", bookRouter);
 app.use("/v1/auth", authRouter);
