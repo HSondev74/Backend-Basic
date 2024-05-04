@@ -43,17 +43,13 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 app.use(morgan("common"));
 app.get("/", async (req, res) => {
-     if (!req.body.name) {
-          return res.status(400).json({ message: "Missing required fields" });
-     }
      try {
-          const newWork = new Work(req.body);
-          const savedWork = await newWork.save();
-          res.status(201).json(savedWork);
+          const allWork = await Work.find();
+          res.status(200).json(allWork);
      } catch (error) {
-          console.error("Failed to add work:", error);
+          console.error("Failed to get all Work:", error);
           res.status(500).json({
-               message: "Error adding work",
+               message: "Error retrieving Work",
                details: error.message,
           });
      }
