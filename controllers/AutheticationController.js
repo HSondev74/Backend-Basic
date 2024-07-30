@@ -42,7 +42,7 @@ const authController = {
      login: async (req, res) => {
           try {
                const user = await Register.findOne({
-                    username: req.body.username,
+                    email: req.body.email,
                });
                if (!user) {
                     res.status(404).json({ message: "username not found" });

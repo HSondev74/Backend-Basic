@@ -19,40 +19,26 @@ dotenv.config();
 //CONNECT DATABASE
 
 // Connection URI
-const uri = process.env.MONGODB_URL;
+const uri = process.env.DB_URI;
 
 // Create a new MongoClient
-const client = new MongoClient(uri, {
-     useNewUrlParser: true,
-     useUnifiedTopology: true,
-});
-
-// Connect to the MongoDB server
-async function connectToMongoDB() {
-     try {
-          await client.connect();
-          console.log("Connected to MongoDB");
-     } catch (err) {
-          console.error("Error connecting to MongoDB:", err);
-     }
-}
-
-connectToMongoDB();
+mongoose.connect(uri);
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 app.use(morgan("common"));
 app.get("/", async (req, res) => {
-     try {
-          const allWork = await Work.find();
-          res.status(200).json(allWork);
-     } catch (error) {
-          console.error("Failed to get all Work:", error);
-          res.status(500).json({
-               message: "Error retrieving Work",
-               details: error.message,
-          });
-     }
+     res.send('Welcome to server!');    
+     // try {
+     //      const allWork = await Work.find();
+     //      res.status(200).json(allWork);
+     // } catch (error) {
+     //      console.error("Failed to get all Work:", error);
+     //      res.status(500).json({
+     //           message: "Error retrieving Work",
+     //           details: error.message,
+     //      });
+     // }
 });
 app.use("/v1/author", authorRouter);
 app.use("/v1/book", bookRouter);

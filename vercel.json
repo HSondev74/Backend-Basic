@@ -1,17 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "*.js", "use": "@vercel/node" }
+    {
+      "src": "dist/main.js",
+      "use": "@vercel/node"
+    }
   ],
-    "routes": [
-      {
-        "src": "/redirect",
-        "status": 308,
-        "headers": { "Location": "https://example.com/" }
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/"
-      }
-    ]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/main.js"
+    }
+  ]
 }
