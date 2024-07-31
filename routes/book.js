@@ -4,7 +4,7 @@ const middlewareController = require("../controllers/middlewareController");
 const router = require("express").Router();
 
 // ADD a BOOK
-
+router.get('/export', middlewareController.verifyToken, bookController.exportBooksToExcel);
 router.post("/", middlewareController.verifyToken, bookController.addABook);
 
 router.get("/", middlewareController.verifyToken, bookController.getAllBooks);
@@ -26,5 +26,7 @@ router.delete(
      middlewareController.verifyTokenAndAdminAuth,
      bookController.deleteBook
 );
+
+
 
 module.exports = router;
