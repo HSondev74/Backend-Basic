@@ -1,54 +1,68 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const XLSX = require('xlsx');
 
-const authorRouter = require("./routes/author");
-const bookRouter = require("./routes/book");
-const authRouter = require("./routes/auth");
-const genreRouter = require("./routes/genre");
-const workRouter = require("./routes/work");
-const { MongoClient } = require("mongodb");
-const { Work } = require("./models/model");
+dotenv.config();
 
-dotenv.config(
-     
-);
-
-//CONNECT DATABASE
-
-// Connection URI
+// Connect to the database
 const uri = process.env.DB_URI;
-
-// Create a new MongoClient
 mongoose.connect(uri);
 
+// Initialize express app
+const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 app.use(morgan("common"));
-app.get("/", async (req, res) => {
-     res.send('Welcome to server!   <33333333333');    
-     // try {
-     //      const allWork = await Work.find();
-     //      res.status(200).json(allWork);
-     // } catch (error) {
-     //      console.error("Failed to get all Work:", error);
-     //      res.status(500).json({
-     //           message: "Error retrieving Work",
-     //           details: error.message,
-     //      });
-     // }
-});
-app.use("/v1/author", authorRouter);
-app.use("/v1/book", bookRouter);
-app.use("/v1/auth", authRouter);
-app.use("/v1/genre", genreRouter);
-app.use("/v1/work", workRouter);
 
+// Home route
+app.get("/", (req, res) => {
+    res.send('Welcome to the server!');
+});
+
+// Route to generate and download an Excel file
+app.get("/generate-excel", (req, res) => {
+    // Data to write
+    const data = [
+        ["Name", "Age"],
+        ["John Doe", 30],
+        ["Jane Smith", 25]
+    ];
+
+    // Convert data to a worksheet
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Create a new workbook and append the worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Specify file name
+    const fileName = 'example.xlsx';
+
+    // Create a buffer from the workbook
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+
+    // Set headers to prompt download
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    // Send the buffer
+    res.send(buf);
+});
+
+
+// Routes for other resources
+app.use("/v1/author", require("./routes/author"));
+app.use("/v1/book", require("./routes/book"));
+app.use("/v1/auth", require("./routes/auth"));
+app.use("/v1/genre", require("./routes/genre"));
+app.use("/v1/work", require("./routes/work"));
+
+// Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-     console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port ${port}`);
 });
